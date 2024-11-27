@@ -15,14 +15,14 @@ mem = Pymem("ATLYSS")
 # DLL of said game
 module1 = module_from_name(mem.process_handle, "UnityPlayer.dll").lpBaseOfDll
 
-Health = []
-Mana = []
-Stamina = []
-Gravity = []
-Max_jumps = []
-Player_speed = [0XA0, 0X60, 0XDC]
-Air_time = []
-Day_cycle = []
+Health_offsets = []
+Mana_offsets = []
+Stamina_offsets = []
+Gravity_offsets = []
+Max_jumps_offsets = []
+Player_speed_offsets = [0XA0, 0X60, 0XDC]
+Air_time_offsets = []
+Day_cycle_offsets = []
 
 
 def getpointeraddress(base, offsets):
@@ -34,6 +34,60 @@ def getpointeraddress(base, offsets):
             return remote_pointer.value + offset
 
 
+# Threads
+def M_Health():
+    new_thread = Thread(target=Health, daemon=True)
+    new_thread.start()
+
+
+def M_Player():
+    new_thread = Thread(target=Player_speed, daemon=True)
+    new_thread.start()
+    
+    
+def M_Mana():
+    new_thread = Thread(target=Mana, daemon=True)
+    new_thread.start()
+    
+    
+def M_Stamina():
+    new_thread = Thread(target=Stamina, daemon=True)
+    new_thread.start()
+    
+    
+def M_Gravity():
+    new_thread = Thread(target=Gravity, daemon=True)
+    new_thread.start()
+    
+    
+def M_Max_jumps():
+    new_thread = Thread(target=Max_jumps, daemon=True)
+    new_thread.start()
+    
+    
+def M_Air():
+    new_thread = Thread(target=Air_time, daemon=True)
+    new_thread.start()
+    
+    
+def M_Day():
+    new_thread = Thread(target=Day_cycle, daemon=True)
+    new_thread.start()
+    
+    
+def Player_speed():
+    addr1 = getpointeraddress(module1 + 0x0, Player_speed_offsets)
+
+    while 1:
+        try:
+            mem.write_int(addr1, 0x0)
+        except pymem.exception.MemoryWriteError as e:
+            print(f"Error writing memory: {e}")
+        if keyboard.is_pressed("F1"):
+            mem.write_int(addr1, 0x0)
+            break
+            
+            
 # Are GUI
 pygame.init()
 pygame.mixer_music.load("music/mod.mp3")
